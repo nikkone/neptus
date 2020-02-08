@@ -2,8 +2,8 @@
 <system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\src\schemas\neptus-vehicle.xsd">
   <!-- Data saved on 2019-09-15T17:16:44.0Z with Neptus version 2019.08.1-dev (compiled on 2019-08-27, gneptus-2019.02.1-dmsmw-97-g917292b78). -->
   <properties>
-    <id>ntnu-otter-01</id>
-    <name>NTNU-Otter-01</name>
+    <id>ntnu-otter-03</id>
+    <name>NTNU-Otter-03</name>
     <type>ASV</type>
     <model>Otter</model>
     <appearance>
@@ -232,7 +232,7 @@
           <port-tcp>6002</port-tcp>
           <udp-on>true</udp-on>
           <tcp-on>false</tcp-on>
-          <imc-id>28:10</imc-id>
+          <imc-id>28:12</imc-id>
         </imc>
       </protocols-args>
     </comm-mean>
