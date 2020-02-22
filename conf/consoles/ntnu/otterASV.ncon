@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<console name="Neptus Console" width="1922" height="1056" resizable="true" mission-file="../../../missions/APDL/missao-apdl.nmisz" main-vehicle="ntnu-otter-01">
-  <!-- Data saved on 2019-11-04T14:35:26.0Z with Neptus version 2019.08.1-dev (compiled on 2019-10-21, gneptus-2019.02.1-dmsmw-106-g411db8284-dirty). -->
+<console name="Neptus Console" width="1853" height="1053" resizable="true" mission-file="../../../missions/APDL/missao-apdl.nmisz" main-vehicle="ntnu-otter-01">
+  <!-- Data saved on 2020-02-11T13:22:20.0Z with Neptus version 2020.01.1-dev (compiled on 2020-02-10, gneptus-2020.01.1-3-gbe2fd19f0). -->
   <mainpanel name="console main panel">
-    <subpanel class="pt.lsts.neptus.console.plugins.containers.MigLayoutContainer" x="0" y="0" width="1920" height="975">
+    <subpanel class="pt.lsts.neptus.console.plugins.containers.MigLayoutContainer" x="0" y="0" width="1853" height="967">
       <properties>
         <entry key="XML Definitions">&lt;profiles&gt;
   &lt;profile name="Normal"&gt;
@@ -37,24 +37,21 @@
         <properties/>
       </child>
       <child class="pt.lsts.neptus.console.plugins.planning.CommandPlanner" x="0" y="0" width="0" height="0">
-        <properties>
-          <entry key="ASV speed units">METERS_PS</entry>
-          <entry key="ASV speed">1.0</entry>
-        </properties>
+        <properties/>
       </child>
       <child class="pt.lsts.neptus.plugins.position.ContactMarker" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
-      <child class="pt.lsts.neptus.controllers.ControllerPanel" x="0" y="0" width="300" height="200">
+      <child class="pt.lsts.neptus.controllers.ControllerPanel" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
-      <child class="pt.lsts.neptus.console.plugins.EntityStatePanel" x="0" y="0" width="0" height="0">
+      <child class="pt.lsts.neptus.console.plugins.EntityStatePanel" x="0" y="0" width="1014" height="370">
         <properties/>
       </child>
       <child class="pt.lsts.neptus.plugins.followref.FollowReferenceInteraction" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
-      <child class="pt.lsts.neptus.console.plugins.base.IncomingDataPanel" x="0" y="0" width="598" height="475">
+      <child class="pt.lsts.neptus.console.plugins.base.IncomingDataPanel" x="0" y="0" width="795" height="646">
         <properties/>
       </child>
       <child class="pt.lsts.neptus.plugins.logs.LogBookSubPanel" x="0" y="0" width="0" height="0">
@@ -71,12 +68,12 @@
       <child class="pt.lsts.neptus.plugins.map.MapEditor" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
-      <child class="pt.lsts.neptus.console.plugins.planning.MapPanel" x="0" y="0" width="1614" height="975">
+      <child class="pt.lsts.neptus.console.plugins.planning.MapPanel" x="0" y="0" width="1547" height="967">
         <properties>
           <entry key="World Map Transparency">false</entry>
         </properties>
       </child>
-      <child class="pt.lsts.neptus.console.plugins.planning.MissionTreePanel" x="0" y="162" width="294" height="807">
+      <child class="pt.lsts.neptus.console.plugins.planning.MissionTreePanel" x="0" y="162" width="294" height="799">
         <properties/>
       </child>
       <child class="pt.lsts.neptus.console.plugins.planning.MultiVehiclePlanOverlay" x="0" y="0" width="0" height="0">
@@ -106,20 +103,13 @@
       <child class="pt.lsts.neptus.console.plugins.planning.PlanStatistics" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
-      <child class="pt.lsts.neptus.plugins.rtplot.RealTimePlot" x="0" y="0" width="298" height="275">
-        <properties>
-          <entry key="Traces Script">MPS_p: ${ControlParcel.Heading &amp; Speed Controller - MPS Parcel.p};
-MPS_i: ${ControlParcel.Heading &amp; Speed Controller - MPS Parcel.i};
-MPS_d: ${ControlParcel.Heading &amp; Speed Controller - MPS Parcel.d};</entry>
-        </properties>
-      </child>
       <child class="pt.lsts.neptus.plugins.s57.S57SoundingsExporter" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
       <child class="pt.lsts.neptus.plugins.sim.SimulationActionsPlugin" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
-      <child class="pt.lsts.neptus.params.SystemConfiguration" x="0" y="0" width="598" height="575">
+      <child class="pt.lsts.neptus.params.SystemConfiguration" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
       <child class="pt.lsts.neptus.console.plugins.SystemsList" x="0" y="0" width="220" height="250">
@@ -160,18 +150,15 @@ MPS_d: ${ControlParcel.Heading &amp; Speed Controller - MPS Parcel.d};</entry>
           <entry key="Enable teleoperation button">true</entry>
         </properties>
       </child>
-      <child class="pt.lsts.neptus.plugins.rtplot.RealTimePlot" x="0" y="0" width="866" height="462">
+      <child class="pt.lsts.neptus.plugins.rtplot.RealTimePlotGroovy" x="0" y="0" width="0" height="0">
         <properties>
-          <entry key="Traces Script">act: ${SetThrusterActuation.value}
-RPM0: ${Rpm.Torqeedo - Motor 0.value}/1000;
-RPM1: ${Rpm.Torqeedo - Motor 1.value}/1000;</entry>
-        </properties>
-      </child>
-      <child class="pt.lsts.neptus.plugins.rtplot.RealTimePlot" x="0" y="0" width="298" height="275">
-        <properties>
-          <entry key="Traces Script">RPM0: ${Rpm.Motor 0.value}/1000;
-RPM1: ${Rpm.Motor 1.value}/1000;
-act: ${SetThrusterActuation.value}</entry>
+          <entry key="Maximum Number of points">100</entry>
+          <entry key="Plot Type">TIMESERIES</entry>
+          <entry key="Periodicity (milliseconds)">1000</entry>
+          <entry key="Initial Script">s = value("EstimatedState.depth")
+addTimeSeries s</entry>
+          <entry key="Current Script">s = value("EstimatedState.depth")
+addTimeSeries s</entry>
         </properties>
       </child>
     </subpanel>
