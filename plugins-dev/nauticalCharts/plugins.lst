@@ -1,0 +1,6 @@
+# DATE=@DATE@
+# TIME=@TIME@
+# COMPILED BY=@COMPILED BY@
+# LEGAL_COPY=@LEGAL_COPY@
+
+pt.up.fe.dceg.neptus.plugins.nauticalCharts.NauticalChartsMapOverlay
