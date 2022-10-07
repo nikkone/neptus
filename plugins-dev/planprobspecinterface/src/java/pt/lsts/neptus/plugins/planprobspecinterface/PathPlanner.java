@@ -29,6 +29,8 @@ import pt.lsts.neptus.NeptusLog;
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.gui.PropertiesEditor;
 import pt.lsts.neptus.plugins.NeptusProperty;
+import pt.lsts.neptus.plugins.NeptusProperty.DistributionEnum;
+import pt.lsts.neptus.plugins.NeptusProperty.LEVEL;
 import pt.lsts.neptus.plugins.PluginDescription;
 import pt.lsts.neptus.plugins.SimpleRendererInteraction;
 import pt.lsts.neptus.renderer2d.Renderer2DPainter;
@@ -41,8 +43,8 @@ import pt.lsts.neptus.util.GuiUtils;
  * @author Nikolai Lauvås
  * 
  */
-@PluginDescription(name = "Online Planner - Shortest Path", icon = "pt/lsts/neptus/plugins/planprobspecinterface/shortest.png")
-public class ShortestPathPlanner extends SimpleRendererInteraction implements Renderer2DPainter,
+@PluginDescription(name = "Online Planner", icon = "pt/lsts/neptus/plugins/planprobspecinterface/shortest.png")
+public class PathPlanner extends SimpleRendererInteraction implements Renderer2DPainter,
         StateRendererInteraction {
 
 
@@ -53,6 +55,10 @@ public class ShortestPathPlanner extends SimpleRendererInteraction implements Re
 
     protected boolean isActive;
 
+
+    @NeptusProperty(name = "Planning Problem Type", userLevel = LEVEL.REGULAR)
+    public PlanProbSpec.PROBLEM_TYPE problemType = PlanProbSpec.PROBLEM_TYPE.COVERAGE;
+    
     @NeptusProperty(name = "Default Speed (m/s)")
     public double defaultSpeed = 1.0;
 
@@ -64,7 +70,7 @@ public class ShortestPathPlanner extends SimpleRendererInteraction implements Re
     /**
      * @param console
      */
-    public ShortestPathPlanner(ConsoleLayout console) {
+    public PathPlanner(ConsoleLayout console) {
         super(console);
     }
 
@@ -117,11 +123,11 @@ public class ShortestPathPlanner extends SimpleRendererInteraction implements Re
 
             menu.addSeparator();
 
-            menu.add("Shortest Path settings").addActionListener(new ActionListener() {
+            menu.add("Planner settings").addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    PropertiesEditor.editProperties(ShortestPathPlanner.this, true);
+                    PropertiesEditor.editProperties(PathPlanner.this, true);
 
                 }
             });
@@ -143,8 +149,7 @@ public class ShortestPathPlanner extends SimpleRendererInteraction implements Re
     protected void generatePlan() {
         PlanProbSpec spec = new PlanProbSpec();
         spec.setVehicle(vehicle);
-        short test = 1;
-        spec.setProblemTypeVal(test);
+        spec.setProblemType(problemType);
         spec.setSpeed(defaultSpeed);
 
         
