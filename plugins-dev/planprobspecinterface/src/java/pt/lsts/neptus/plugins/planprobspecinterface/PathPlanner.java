@@ -20,6 +20,8 @@ import java.util.Vector;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
+import javax.vecmath.Point3d;
+
 
 
 import pt.lsts.imc.PlanProbSpec;
@@ -36,6 +38,7 @@ import pt.lsts.neptus.plugins.SimpleRendererInteraction;
 import pt.lsts.neptus.renderer2d.Renderer2DPainter;
 import pt.lsts.neptus.renderer2d.StateRenderer2D;
 import pt.lsts.neptus.renderer2d.StateRendererInteraction;
+import pt.lsts.neptus.types.map.PathElement;
 import pt.lsts.neptus.types.coord.LocationType;
 import pt.lsts.neptus.util.GuiUtils;
 
@@ -47,11 +50,17 @@ import pt.lsts.neptus.util.GuiUtils;
 public class PathPlanner extends SimpleRendererInteraction implements Renderer2DPainter,
         StateRendererInteraction {
 
-
+    public enum EDITION_STATES {
+        NONE,
+        DEFINE_COVERAGE_POLYGON
+    };
     public LocationType destination = null;
     public LocationType initial = null;
     public LocationType bottomLeft = null;
     public LocationType topRight = null;
+    protected PathElement currentObstacle = null;
+    protected EDITION_STATES state = EDITION_STATES.NONE;
+
 
     protected boolean isActive;
 
@@ -92,57 +101,104 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
 
         if (event.getButton() == MouseEvent.BUTTON3) {
             JPopupMenu menu = new JPopupMenu();
-            menu.add("Define boundary's bottom left").addActionListener(new ActionListener() {
+            switch (state) {
+                case NONE:
+                    menu.add("Define initial location").addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            initial = renderer.getRealWorldLocation(mousePosition);
+                        }
+                    });
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    bottomLeft = renderer.getRealWorldLocation(mousePosition);
-                }
-            });
+                    switch (problemType) {
+                        case FPATH:
+                            menu.add("Define destination location").addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    destination = renderer.getRealWorldLocation(mousePosition);
+                                }
+                            });
+                            menu.add("Define boundary's bottom left").addActionListener(new ActionListener() {
 
-            menu.add("Define boundary's top right").addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    bottomLeft = renderer.getRealWorldLocation(mousePosition);
+                                }
+                            });
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    topRight = renderer.getRealWorldLocation(mousePosition);
-                }
-            });
-            menu.add("Define initial location").addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    initial = renderer.getRealWorldLocation(mousePosition);
-                }
-            });
+                            menu.add("Define boundary's top right").addActionListener(new ActionListener() {
 
-            menu.add("Define destination location").addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    destination = renderer.getRealWorldLocation(mousePosition);
-                }
-            });
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    topRight = renderer.getRealWorldLocation(mousePosition);
+                                }
+                            });
+                        break;
+                        case COVERAGE:
+                            menu.add("Define Search Area").addActionListener(new ActionListener() {
 
-            menu.addSeparator();
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    state = EDITION_STATES.DEFINE_COVERAGE_POLYGON;
+                                    LocationType loc = renderer.getRealWorldLocation(mousePosition);
+                                    currentObstacle = null;
+                                    currentObstacle = new PathElement(renderer.getMapGroup(), null, loc);
+                                    currentObstacle.setFilled(true);
+                                    currentObstacle.setShape(true);
+                                    currentObstacle.setMyColor(Color.yellow);
+                                    currentObstacle.addPoint(0, 0, 0, false);
 
-            menu.add("Planner settings").addActionListener(new ActionListener() {
+                                    return;
+                                }
+                            });
+                        break;
+                    }
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    PropertiesEditor.editProperties(PathPlanner.this, true);
+                    menu.addSeparator();
 
-                }
-            });
+                    menu.add("Planner settings").addActionListener(new ActionListener() {
 
-            menu.addSeparator();
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            PropertiesEditor.editProperties(PathPlanner.this, true);
 
-            menu.add("Generate plan").addActionListener(new ActionListener() {
+                        }
+                    });
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    generatePlan();
-                }
-            });
+                    menu.addSeparator();
 
+                    menu.add("Generate plan").addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            generatePlan();
+                        }
+                    });
+
+                break;
+                case DEFINE_COVERAGE_POLYGON:
+                    menu.add("Finish Coverage Polygon").addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            currentObstacle.setFinished(true);
+                            currentObstacle.setMyColor(Color.orange);
+                            //obstacles.add(currentObstacle);
+                            //currentObstacle = null;
+                            state = EDITION_STATES.NONE;
+                        }
+                    });
+                break;
+            }
             menu.show(source, (int) mousePosition.getX(), (int) mousePosition.getY());
+        }
+
+        else {
+            if (state == EDITION_STATES.DEFINE_COVERAGE_POLYGON) {
+                NeptusLog.pub().info("<###> "+renderer.getRealWorldLocation(mousePosition));
+                LocationType loc = renderer.getRealWorldLocation(mousePosition);
+                double offsets[] = loc.getOffsetFrom(currentObstacle.getCenterLocation());
+                currentObstacle.addPoint(offsets[1], offsets[0], 0, false);
+            }
         }
     }
 
@@ -155,32 +211,39 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
         
         spec.setStartLat(initial.getLatitudeRads());
         spec.setStartLon(initial.getLongitudeRads());
-        spec.setEndLat(destination.getLatitudeRads());
-        spec.setEndLon(destination.getLongitudeRads());
+
         Vector<PolygonVertex> area = new Vector<>();
-        area.add(new PolygonVertex(bottomLeft.getLatitudeRads(), bottomLeft.getLongitudeRads()));
-        area.add(new PolygonVertex(topRight.getLatitudeRads(), topRight.getLongitudeRads()));
+        switch (problemType) {
+            case FPATH:
+                area.add(new PolygonVertex(bottomLeft.getLatitudeRads(), bottomLeft.getLongitudeRads()));
+                area.add(new PolygonVertex(topRight.getLatitudeRads(), topRight.getLongitudeRads()));
+                spec.setEndLat(destination.getLatitudeRads());
+                spec.setEndLon(destination.getLongitudeRads());
+            break;
+            case COVERAGE:
+                Vector<Point3d> points = currentObstacle.getPoints();
+                LocationType center = new LocationType(currentObstacle.getCenterLocation().convertToAbsoluteLatLonDepth());
+                for (Point3d pt : points) {
+                    LocationType loc = new LocationType(center);
+                    loc.translatePosition(pt.x, pt.y, 0);
+                    loc.convertToAbsoluteLatLonDepth();
+                    area.add(new PolygonVertex(loc.getLatitudeRads(), loc.getLongitudeRads()));
+                    //writer.append(loc.getLatitudeDegs() + ", " + loc.getLongitudeDegs() + "; ");
+                }
+            break;
+        }
+
         spec.setArea(area);
         spec.setCustom(customparameters);
         
 
         send(spec);
-        NeptusLog.pub().info("Sent feasible path request to vehicle");
+        NeptusLog.pub().info("Sent path generation request to vehicle");
     }
 
     @Override
     public void paint(Graphics2D g, StateRenderer2D renderer) {
 
-        if (destination != null) {
-            Point2D point = renderer.getScreenPosition(destination);
-            if (isActive)
-                g.setColor(Color.red);
-            else
-                g.setColor(Color.red.darker().darker());
-
-            g.fill(new Ellipse2D.Double(point.getX() - 5, point.getY() - 5, 10, 10));
-            g.draw(new Ellipse2D.Double(point.getX() - 5, point.getY() - 5, 10, 10));
-        }
 
         g.setColor(Color.green.darker());
         g.setStroke(new BasicStroke(4.0f));
@@ -196,33 +259,50 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
             g.draw(new Ellipse2D.Double(point.getX() - 5, point.getY() - 5, 10, 10));
         }
 
-        if (isActive) {
-            if (bottomLeft != null) {
-                Point2D point = renderer.getScreenPosition(bottomLeft);
-                g.draw(new Line2D.Double(point.getX(), point.getY(), point.getX() + 20, point.getY()));
-                g.draw(new Line2D.Double(point.getX(), point.getY(), point.getX(), point.getY() - 20));
-            }
-
-            if (topRight != null) {
-                Point2D point = renderer.getScreenPosition(topRight);
-                g.draw(new Line2D.Double(point.getX() - 20, point.getY(), point.getX(), point.getY()));
-                g.draw(new Line2D.Double(point.getX(), point.getY(), point.getX(), point.getY() + 20));
-            }
-        }
-
         g.setColor(Color.black);
         g.setStroke(new BasicStroke(1.0f));
-        if (topRight != null && bottomLeft != null) {
-            Point2D topo = renderer.getScreenPosition(topRight);
-            Point2D fundo = renderer.getScreenPosition(bottomLeft);
-
-            double x = Math.min(topo.getX(), fundo.getX());
-            double y = Math.min(topo.getY(), fundo.getY());
-
-            double w = Math.abs(topo.getX() - fundo.getX());
-            double h = Math.abs(topo.getY() - fundo.getY());
-
-            g.draw(new Rectangle2D.Double(x, y, w, h));
+        switch (problemType) {
+            case FPATH:
+            if (destination != null) {
+                Point2D point = renderer.getScreenPosition(destination);
+                if (isActive)
+                    g.setColor(Color.red);
+                else
+                    g.setColor(Color.red.darker().darker());
+    
+                g.fill(new Ellipse2D.Double(point.getX() - 5, point.getY() - 5, 10, 10));
+                g.draw(new Ellipse2D.Double(point.getX() - 5, point.getY() - 5, 10, 10));
+            }
+            if (isActive) {
+                if (bottomLeft != null) {
+                    Point2D point = renderer.getScreenPosition(bottomLeft);
+                    g.draw(new Line2D.Double(point.getX(), point.getY(), point.getX() + 20, point.getY()));
+                    g.draw(new Line2D.Double(point.getX(), point.getY(), point.getX(), point.getY() - 20));
+                }
+    
+                if (topRight != null) {
+                    Point2D point = renderer.getScreenPosition(topRight);
+                    g.draw(new Line2D.Double(point.getX() - 20, point.getY(), point.getX(), point.getY()));
+                    g.draw(new Line2D.Double(point.getX(), point.getY(), point.getX(), point.getY() + 20));
+                }
+            }
+                if (topRight != null && bottomLeft != null) {
+                    Point2D topo = renderer.getScreenPosition(topRight);
+                    Point2D fundo = renderer.getScreenPosition(bottomLeft);
+        
+                    double x = Math.min(topo.getX(), fundo.getX());
+                    double y = Math.min(topo.getY(), fundo.getY());
+        
+                    double w = Math.abs(topo.getX() - fundo.getX());
+                    double h = Math.abs(topo.getY() - fundo.getY());
+        
+                    g.draw(new Rectangle2D.Double(x, y, w, h));
+                }
+            break;
+            case COVERAGE:
+                if (currentObstacle != null)
+                currentObstacle.paint(g, renderer, renderer.getRotation());
+            break;
         }
     }
 
