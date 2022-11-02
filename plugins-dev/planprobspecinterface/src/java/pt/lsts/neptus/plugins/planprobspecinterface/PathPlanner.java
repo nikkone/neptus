@@ -54,6 +54,12 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
         NONE,
         DEFINE_COVERAGE_POLYGON
     };
+
+    public enum GRID_TYPES {
+        HEXAGONAL,
+        SQUARE,
+        TRIANGULAR
+    };
     public LocationType destination = null;
     public LocationType initial = null;
     public LocationType bottomLeft = null;
@@ -64,6 +70,29 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
 
     protected boolean isActive;
 
+    @NeptusProperty(name = "Planning timeout", category = "Feasible Path")
+    public double planingTimeout = 60;
+
+    @NeptusProperty(name = "Planner", category = "Feasible Path")
+    public String feasiblePathPlanner = "1";
+
+    @NeptusProperty(name = "Activate plan")
+    public Boolean activatePlan = true;
+
+    @NeptusProperty(name = "Grid Geometry", category = "Coverage Planner")
+    public GRID_TYPES gridGeometry = GRID_TYPES.HEXAGONAL;
+
+    @NeptusProperty(name = "Grid Size", category = "Coverage Planner")
+    public double gridSize = 75.0;
+
+    @NeptusProperty(name = "Planner", category = "Coverage Planner")
+    public int coveragePlanner = 0;
+
+    @NeptusProperty(name = "Azimuth Weight", category = "Coverage Planner")
+    public double azimuthWeight = 0.001;
+
+    @NeptusProperty(name = "Distance Weight", category = "Coverage Planner")
+    public double distanceWeight = 0.0005;
 
     @NeptusProperty(name = "Planning Problem Type", userLevel = LEVEL.REGULAR)
     public PlanProbSpec.PROBLEM_TYPE problemType = PlanProbSpec.PROBLEM_TYPE.COVERAGE;
@@ -74,8 +103,9 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
     @NeptusProperty(name = "Vehicle(-1=current)")
     public int vehicle = 0x2810;
 
-    @NeptusProperty(name = "Custom Parameters")
-    public String customparameters = "t=60.0;p=1;a=1;";
+    //@NeptusProperty(name = "Custom Parameters") public 
+    String customparameters = "t=60.0;p=1;a=1;";
+
     /**
      * @param console
      */
@@ -157,9 +187,9 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
                     menu.addSeparator();
 
                     menu.add("Planner settings").addActionListener(new ActionListener() {
-
                         @Override
                         public void actionPerformed(ActionEvent e) {
+
                             PropertiesEditor.editProperties(PathPlanner.this, true);
 
                         }
@@ -208,10 +238,11 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
         spec.setProblemType(problemType);
         spec.setSpeed(defaultSpeed);
 
-        
         spec.setStartLat(initial.getLatitudeRads());
         spec.setStartLon(initial.getLongitudeRads());
 
+
+        String parameters = "a=" + ((activatePlan) ? 1 : 0) + ";";
         Vector<PolygonVertex> area = new Vector<>();
         switch (problemType) {
             case FPATH:
@@ -219,6 +250,8 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
                 area.add(new PolygonVertex(topRight.getLatitudeRads(), topRight.getLongitudeRads()));
                 spec.setEndLat(destination.getLatitudeRads());
                 spec.setEndLon(destination.getLongitudeRads());
+                parameters += "t=" + planingTimeout + ";";
+                parameters += "p=" + feasiblePathPlanner + ";";
             break;
             case COVERAGE:
                 Vector<Point3d> points = currentObstacle.getPoints();
@@ -228,13 +261,17 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
                     loc.translatePosition(pt.x, pt.y, 0);
                     loc.convertToAbsoluteLatLonDepth();
                     area.add(new PolygonVertex(loc.getLatitudeRads(), loc.getLongitudeRads()));
-                    //writer.append(loc.getLatitudeDegs() + ", " + loc.getLongitudeDegs() + "; ");
                 }
+                parameters += "gg=" + (short)gridGeometry.ordinal() + ";";
+                parameters += "gs=" + gridSize + ";";
+                parameters += "p=" + coveragePlanner + ";";
+                parameters += "paw=" + azimuthWeight + ";";
+                parameters += "pdw=" + distanceWeight + ";";
             break;
         }
 
         spec.setArea(area);
-        spec.setCustom(customparameters);
+        spec.setCustom(parameters);
         
 
         send(spec);
