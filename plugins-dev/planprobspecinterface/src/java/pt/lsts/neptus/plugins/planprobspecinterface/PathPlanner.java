@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2021 
+ * Copyright (c) 2004-2022 
  * Author: Nikolai Lauvås
  */
 package pt.lsts.neptus.plugins.planprobspecinterface;
@@ -89,10 +89,19 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
     public int coveragePlanner = 0;
 
     @NeptusProperty(name = "Azimuth Weight", category = "Coverage Planner")
-    public double azimuthWeight = 0.001;
+    public double azimuthWeight = 0.0001;
 
     @NeptusProperty(name = "Distance Weight", category = "Coverage Planner")
-    public double distanceWeight = 0.0005;
+    public double distanceWeight = 1.0;
+
+    @NeptusProperty(name = "StationKeep Steps", category = "Coverage Planner")
+    public int waitingSteps = 90;
+
+    @NeptusProperty(name = "Reuse Previous Map", category = "Coverage Planner")
+    public Boolean reuseMap = false;
+
+    @NeptusProperty(name = "Use OMPL (else go direct)", category = "Coverage Planner")
+    public Boolean targetSearchUseOMPL = true;
 
     @NeptusProperty(name = "Planning Problem Type", userLevel = LEVEL.REGULAR)
     public PlanProbSpec.PROBLEM_TYPE problemType = PlanProbSpec.PROBLEM_TYPE.COVERAGE;
@@ -267,6 +276,11 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
                 parameters += "p=" + coveragePlanner + ";";
                 parameters += "paw=" + azimuthWeight + ";";
                 parameters += "pdw=" + distanceWeight + ";";
+
+                parameters += "sk=" + waitingSteps + ";";
+                parameters += "r=" + ((reuseMap) ? 1 : 0) + ";";
+                parameters += "o=" + ((targetSearchUseOMPL) ? 1 : 0) + ";";
+
             break;
         }
 
