@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2021 Universidade do Porto - Faculdade de Engenharia
+ * Copyright (c) 2004-2023 Universidade do Porto - Faculdade de Engenharia
  * Laboratório de Sistemas e Tecnologia Subaquática (LSTS)
  * All rights reserved.
  * Rua Dr. Roberto Frias s/n, sala I203, 4200-465 Porto, Portugal
@@ -256,8 +256,10 @@ public class TCPTransport {
         synchronized (clients) {
             for (SocketChannel channelTmp : clients) {
                 try {
-//                    NeptusLog.pub().info("<###> "+resolveAddress(host) +"  " +port + "   " +channelTmp.socket().getInetAddress() + " " + channelTmp.socket().getPort());
-                    if (resolveAddress(host).toString().equalsIgnoreCase(channelTmp.socket().getInetAddress().toString())
+                    NeptusLog.pub().info("<###> "+resolveAddress(host) +"  " +port + "   " +channelTmp.socket().getInetAddress() + " " + channelTmp.socket().getPort());
+                    if ((resolveAddress(host).toString().equalsIgnoreCase(channelTmp.socket().getInetAddress().toString()) ||
+                            resolveAddress(host).toString().replaceFirst("^[a-zA-Z0-9._-]*(/)", "$1").
+                                    equalsIgnoreCase(channelTmp.socket().getInetAddress().toString()))
                             && port == channelTmp.socket().getPort()) {
                         channel = channelTmp;
                         break;
@@ -659,7 +661,8 @@ public class TCPTransport {
                                             if (sendAck) {
 //                                                NeptusLog.pub().info("<###>WRITE  ...........................................");
                                                 SocketChannel channel = (SocketChannel) key.channel();
-                                                ByteBuffer bf = ByteBuffer.wrap(new byte[] { (byte) 0xFFFF });
+                                                //ByteBuffer bf = ByteBuffer.wrap(new byte[] { (byte) 0xFFFF });
+                                                ByteBuffer bf = ByteBuffer.wrap(new byte[0]);
 //                                                NeptusLog.pub().info("<###>WRITE  " + channel.write(bf));
                                                 channel.write(bf);
                                                 key.attach(System.currentTimeMillis());
