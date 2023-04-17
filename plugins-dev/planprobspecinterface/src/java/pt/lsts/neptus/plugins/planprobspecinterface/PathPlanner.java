@@ -74,7 +74,7 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
     public double planingTimeout = 60;
 
     @NeptusProperty(name = "Planner", category = "Feasible Path")
-    public String feasiblePathPlanner = "1";
+    public int feasiblePathPlanner = 1;
 
     @NeptusProperty(name = "Activate plan")
     public Boolean activatePlan = true;
@@ -113,7 +113,7 @@ public class PathPlanner extends SimpleRendererInteraction implements Renderer2D
     public int vehicle = 0x2810;
 
     //@NeptusProperty(name = "Custom Parameters") public 
-    String customparameters = "t=60.0;p=1;a=1;";
+    //String customparameters = "t=60.0;p=1;a=1;";
 
     /**
      * @param console
