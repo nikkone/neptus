@@ -81,10 +81,10 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
     public int leader = 0x2810;
 
     @NeptusProperty(name = "Formation Participants")
-    public String participants = "ntnu-otter-01;ntnu-otter-02;ntnu-otter-03";
+    public String participants = "ntnu-otter-01,ntnu-otter-02,ntnu-otter-03";
 
     @NeptusProperty(name = "Rotate Distance On Estimate", category="Custom Parameters")
-    public double rotation_dist = Math.PI/8;
+    public double rotation_dist = 0.0;//Math.PI/8;
 
     @NeptusProperty(name = "Minimum Tag Interval", category="Custom Parameters")
     public double minTagInterval = 30.0;
@@ -93,10 +93,10 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
     public double maxTagInterval = 90.0;
 
     @NeptusProperty(name = "FollowRef Timeout", category="Custom Parameters")
-    public double timeout = 10.0;
+    public double timeout = 60.0;
 
     @NeptusProperty(name = "FollowRef Transmitt Interval", category="Custom Parameters")
-    public double FollowRefInterval = 90.0;
+    public double FollowRefInterval = 5.0;
 
     @NeptusProperty(name = "Custom Parameters", category="Custom Parameters")
     public String customparameters = "";
@@ -149,6 +149,15 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
 
             }
         });
+
+        menu.add("Update Custom Parameters").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                sendCustomParameters();
+
+            }
+        });
         menu.addSeparator();
 
             menu.show(source, (int) mousePosition.getX(), (int) mousePosition.getY());
@@ -171,6 +180,8 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
         toSend.setMsgType(otterFormation.MSG_TYPE.START);
         toSend.setMinSpeed(minSpeed);
         toSend.setMaxSpeed(maxSpeed);
+        toSend.setMinRadius(minRadius);
+        toSend.setMaxRadius(maxRadius);
         toSend.setSpeedUnits(speed_units);
         toSend.setTarget(target);
         toSend.setParticipants(participants);
@@ -181,10 +192,31 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
             customparameters += "x=" + maxTagInterval + ";";
             customparameters += "t=" + timeout + ";";
             customparameters += "f=" + FollowRefInterval + ";";
+            toSend.setCustom(customparameters);
+            customparameters = "";
+        } else {
+            toSend.setCustom(customparameters);
+        }
+
+        
+        send(toSend);
+        NeptusLog.pub().info("Sent start formation controller request to vehicle");
+    }
+
+    protected void sendCustomParameters() {
+        otterFormation toSend = new otterFormation();
+        toSend.setDst(leader);
+        toSend.setMsgType(otterFormation.MSG_TYPE.PARAM_CHANGE);
+        if(customparameters.isEmpty()) {
+            customparameters += "r=" + rotation_dist + ";";
+            customparameters += "i=" + minTagInterval + ";";
+            customparameters += "x=" + maxTagInterval + ";";
+            customparameters += "t=" + timeout + ";";
+            customparameters += "f=" + FollowRefInterval + ";";
         }
         toSend.setCustom(customparameters);
         send(toSend);
-        NeptusLog.pub().info("Sent start formation controller request to vehicle");
+        NeptusLog.pub().info("Sent start formation controller request to vehicle");        
     }
     @Override
     public void paint(Graphics2D g, StateRenderer2D renderer) {
