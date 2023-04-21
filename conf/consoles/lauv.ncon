@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<console name="Neptus Console" width="2486" height="1413" resizable="true" mission-file="../../missions/APDL/missao-apdl.nmisz" main-vehicle="ntnu-otter-01">
-  <!-- Data saved on 2023-04-17T23:30:36.0Z with Neptus version 2023.01.0-SNAPSHOT (compiled on 2023-04-17, gneptus-2020.01.1-757-g0f23b4e-dirty). -->
+<console name="Neptus Console" width="1920" height="1200" resizable="true" mission-file="../../missions/APDL/missao-apdl.nmisz" main-vehicle="ntnu-otter-01">
+  <!-- Data saved on 2023-04-20T22:15:23.0Z with Neptus version 2023.01.0-SNAPSHOT (compiled on 2023-04-20, gneptus-2020.01.1-760-g69f2fe4-dirty). -->
   <mainpanel name="console main panel">
-    <subpanel class="pt.lsts.neptus.console.plugins.containers.MigLayoutContainer" x="0" y="0" width="2486" height="1322">
+    <subpanel class="pt.lsts.neptus.console.plugins.containers.MigLayoutContainer" x="0" y="0" width="1920" height="1109">
       <properties>
         <entry key="XML Definitions">&lt;profiles&gt; &lt;profile name="Normal"&gt; &lt;container layoutparam="ins 0" param="w 100%, h 100%"&gt; &lt;child name="Map Panel" param="w 100%, h 100%"/&gt; &lt;/container&gt; &lt;container layoutparam="ins 3" param="w 300px!, h 100%"&gt; &lt;container layoutparam="ins 0, filly" param="w 100%, h 100%"&gt; &lt;child name="Plan Control" param="w 80%, h 50px!"/&gt; &lt;child name="Abort Button" param="w 20%, h 50px!, wrap"/&gt; &lt;child name="Plan Control State" param="w 100%!, h 100px!, span, wrap"/&gt; &lt;child name="Mission Tree" param="w 100%, h 100%, span"/&gt; &lt;/container&gt; &lt;/container&gt; &lt;/profile&gt; &lt;profile name="Map"&gt; &lt;container layoutparam="ins 0" param="w 100%, h 100%"&gt; &lt;child name="Map Panel" param="w 100%, h 100%"/&gt; &lt;/container&gt; &lt;/profile&gt; &lt;/profiles&gt;</entry>
       </properties>
@@ -15,7 +15,9 @@
         <properties/>
       </child>
       <child class="pt.lsts.neptus.console.plugins.planning.CommandPlanner" x="0" y="0" width="0" height="0">
-        <properties/>
+        <properties>
+          <entry key="ASV speed">1.50 m/s</entry>
+        </properties>
       </child>
       <child class="pt.lsts.neptus.plugins.position.ContactMarker" x="0" y="0" width="0" height="0">
         <properties/>
@@ -46,12 +48,12 @@
       <child class="pt.lsts.neptus.plugins.map.MapEditor" x="0" y="0" width="0" height="0">
         <properties/>
       </child>
-      <child class="pt.lsts.neptus.console.plugins.planning.MapPanel" x="0" y="0" width="2180" height="1322">
+      <child class="pt.lsts.neptus.console.plugins.planning.MapPanel" x="0" y="0" width="1614" height="1109">
         <properties>
           <entry key="World Map Transparency">false</entry>
         </properties>
       </child>
-      <child class="pt.lsts.neptus.console.plugins.planning.MissionTreePanel" x="0" y="162" width="294" height="1154">
+      <child class="pt.lsts.neptus.console.plugins.planning.MissionTreePanel" x="0" y="162" width="294" height="941">
         <properties/>
       </child>
       <child class="pt.lsts.neptus.console.plugins.MyLocationDisplay" x="0" y="0" width="0" height="0">
@@ -106,38 +108,19 @@
       </child>
       <child class="pt.lsts.neptus.plugins.otterformationinterface.formationInterface" x="0" y="0" width="0" height="0">
         <properties>
-          <entry key="Rotate Distance On Estimate">0.39269908169872414</entry>
-          <entry key="Formation Leader Vehicle">10256</entry>
-          <entry key="Maximum Radius">120.0</entry>
-          <entry key="Minimum Speed">0.0</entry>
-          <entry key="Speed Units">METERS_PS</entry>
-          <entry key="Maximum Tag Interval">90.0</entry>
+          <entry key="Minimum Radius">63.0</entry>
           <entry key="Source To Follow">Fish_position_est_1</entry>
-          <entry key="Custom Parameters">r=0.39269908169872414;i=30.0;x=90.0;t=10.0;f=90.0;</entry>
-          <entry key="FollowRef Timeout">10.0</entry>
-          <entry key="Minimum Radius">40.0</entry>
-          <entry key="Maximum Speed">1.0</entry>
-          <entry key="Minimum Tag Interval">30.0</entry>
-          <entry key="Formation Participants">ntnu-otter-01,ntnu-otter-02,ntnu-otter-03</entry>
-          <entry key="FollowRef Transmitt Interval">90.0</entry>
+          <entry key="Custom Parameters">r=0.0;i=30.0;x=90.0;t=60.0;f=5.0;</entry>
+          <entry key="Formation Participants">ntnu-otter-02,ntnu-otter-01,ntnu-otter-03</entry>
         </properties>
       </child>
       <child class="pt.lsts.neptus.plugins.planprobspecinterface.PathPlanner" x="0" y="0" width="0" height="0">
         <properties>
-          <entry key="Vehicle(-1=current)">10256</entry>
-          <entry key="Reuse Previous Map">false</entry>
           <entry key="Planner">0</entry>
-          <entry key="Distance Weight">1.0</entry>
-          <entry key="Planning Problem Type">COVERAGE</entry>
-          <entry key="Planning timeout">60.0</entry>
-          <entry key="Grid Size">75.0</entry>
-          <entry key="Grid Geometry">HEXAGONAL</entry>
-          <entry key="StationKeep Steps">90</entry>
-          <entry key="Use OMPL (else go direct)">true</entry>
-          <entry key="Activate plan">true</entry>
-          <entry key="Azimuth Weight">1.0E-4</entry>
-          <entry key="Default Speed (m/s)">1.0</entry>
         </properties>
+      </child>
+      <child class="pt.lsts.neptus.plugins.formationcontrol.MyFirstPlugin" x="0" y="0" width="0" height="0">
+        <properties/>
       </child>
     </subpanel>
   </mainpanel>

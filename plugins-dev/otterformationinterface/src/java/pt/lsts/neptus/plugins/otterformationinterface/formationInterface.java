@@ -3,7 +3,8 @@
  * Author: Nikolai Lauvås
  */
 package pt.lsts.neptus.plugins.otterformationinterface;
-
+import com.google.common.eventbus.Subscribe;
+import ucar.unidata.geoloc.Earth;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -14,6 +15,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.*;
 
 import java.util.Vector;
 
@@ -30,6 +32,7 @@ import pt.lsts.neptus.types.vehicle.VehiclesHolder;
 
 
 import pt.lsts.imc.PlanProbSpec;
+import pt.lsts.imc.RemoteSensorInfo;
 import pt.lsts.imc.PolygonVertex;
 
 import pt.lsts.neptus.NeptusLog;
@@ -58,6 +61,9 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
     //protected EDITION_STATES state = EDITION_STATES.NONE;
 
     protected boolean isActive;
+    private boolean hasFishLocation = false;
+    private RemoteSensorInfo fish_rsi = new RemoteSensorInfo();
+
 
     @NeptusProperty(name = "Minimum Speed")
     public double minSpeed = 0.0;
@@ -167,6 +173,21 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
             // Leftclick
         //}
     }
+
+    @Subscribe
+    public void consume(RemoteSensorInfo msg) {
+        //fishLocationTime = System.currentTimeMillis();
+
+        if (!msg.getId().equals(target))
+            return;
+
+        //if (!hasFishLocation)
+        //    post(Notification.success("Multiple-vehicle controller","Got fish location!"));
+
+        hasFishLocation = true;
+        fish_rsi = msg;
+    }
+
     protected void endFormationMessage() {
         otterFormation toSend = new otterFormation();
         toSend.setDst(leader);
@@ -193,7 +214,7 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
             customparameters += "t=" + timeout + ";";
             customparameters += "f=" + FollowRefInterval + ";";
             toSend.setCustom(customparameters);
-            customparameters = "";
+            String customparameters = "";
         } else {
             toSend.setCustom(customparameters);
         }
@@ -206,6 +227,11 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
     protected void sendCustomParameters() {
         otterFormation toSend = new otterFormation();
         toSend.setDst(leader);
+        toSend.setMinSpeed(minSpeed);
+        toSend.setMaxSpeed(maxSpeed);
+        toSend.setMinRadius(minRadius);
+        toSend.setMaxRadius(maxRadius);
+        toSend.setSpeedUnits(speed_units);
         toSend.setMsgType(otterFormation.MSG_TYPE.PARAM_CHANGE);
         if(customparameters.isEmpty()) {
             customparameters += "r=" + rotation_dist + ";";
@@ -213,6 +239,7 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
             customparameters += "x=" + maxTagInterval + ";";
             customparameters += "t=" + timeout + ";";
             customparameters += "f=" + FollowRefInterval + ";";
+            String customparameters = "";
         }
         toSend.setCustom(customparameters);
         send(toSend);
@@ -228,8 +255,32 @@ public class formationInterface extends SimpleRendererInteraction implements Ren
         g.setColor(Color.black);
         g.setStroke(new BasicStroke(1.0f));
 
+
+        //if (hasFishLocation) {
+        //    // Plot Inner Tolerance Circle
+        //    Graphics2D g4d = (Graphics2D) g.create();
+        //    Stroke solidStroke = new BasicStroke(3);
+//
+        //    g4d.setStroke(solidStroke);
+//
+        //    double horizontalAcc = renderer.getZoom() * 2*((vehicle.params.getD() - vehicle.params.getDelta()) * Earth.getRadius());
+//
+        //    Ellipse2D circle3 = new Ellipse2D.Double(
+        //            screenPosition2.getX()-horizontalAcc/2,  // coordinate of top-left corner of circle
+        //            screenPosition2.getY()-horizontalAcc/2,  // coordinate of top-left corner of circle
+        //            horizontalAcc,                          // diameter of the circle
+        //            horizontalAcc);
+//
+        //    g4d.setColor(vehicle.referenceColor);
+        //    g4d.draw(circle3);                        // diameter of the circle
+        //    g4d.dispose();
+        //}
+
+
+
     }
 
+    
     /*
      * (non-Javadoc)
      * 
